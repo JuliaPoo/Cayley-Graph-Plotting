@@ -1,0 +1,15 @@
+{
+  "name": "cayley-graphs-yay",
+  "version": "0.0.1",
+  "description": ">uwu<",
+  "main": "web/js/index.js",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "npx http-server . -p 9999 -o web"
+  },
+  "author": "JuliaPoo",
+  "license": "ISC"
+}
