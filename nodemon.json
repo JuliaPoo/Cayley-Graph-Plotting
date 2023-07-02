@@ -2,5 +2,5 @@
     "watch": ["ts", "nodemon.json", "tsconfig.json"],
     "ext": ".ts,.js",
     "ignore": [],
-    "exec": "npx ts-node --esm ./ts/index.ts && npm run build"
+    "exec": "npx ts-node ./ts/cayley.ts && npm run build"
 }
