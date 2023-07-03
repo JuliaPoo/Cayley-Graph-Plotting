@@ -16,6 +16,28 @@ export class Group {
     get ngen() {
         return this.gens.length;
     }
+    get cayley() {
+        const graph = [[this.id, []]];
+        const visited = [this.id];
+        const stack = [0];
+        while (stack.length > 0) {
+            const nidx = stack.pop();
+            const [e, cs] = graph[nidx];
+            this.gens.forEach((g) => {
+                const h = e.mul(g);
+                const idx = visited.indexOf(h);
+                if (idx == -1) {
+                    cs.push(graph.length);
+                    stack.push(graph.length);
+                    visited.push(h);
+                    graph.push([h, []]);
+                    return;
+                }
+                cs.push(idx);
+            });
+        }
+        return graph;
+    }
 }
 export class GroupElement {
     constructor(grp, mat) {

@@ -18,7 +18,7 @@ export class Matrix {
     }
     add(o) {
         assert(() => o.fp == this.fp, "Adding matrices of different fp");
-        return new Matrix(zip(o.mat, this.mat).map((r) => (r[0] + r[1]) % this.fp), this.fp);
+        return new Matrix(zip(o.mat, this.mat).map((r) => this.fp == -1 ? r[0] + r[1] : (r[0] + r[1]) % this.fp), this.fp);
     }
     mul(o) {
         assert(() => o.fp == this.fp, "Multiplying matrices of different fp");
@@ -28,7 +28,7 @@ export class Matrix {
             const y = Math.floor(i / d);
             return range(0, d)
                 .map((j) => this.mat[y * d + j] * o.mat[x + j * d])
-                .reduce((a, b) => (a + b) % this.fp);
+                .reduce((a, b) => (this.fp == -1 ? a + b : (a + b) % this.fp));
         }), this.fp);
     }
     equal(o) {

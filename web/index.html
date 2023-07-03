@@ -1,14 +1,89 @@
 <html>
 <head>
-    <!-- <link rel="stylesheet" href="./css/main.css"> -->
-</head>
-<body>
-
+<link rel="stylesheet" href="./css/main.css">
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three/build/three.module.js" }}</script>
+<script src="//unpkg.com/3d-force-graph"></script>
 <script type="module">
-import * as ts from "./js/cayley.js";
 
-ts.Group;
+import * as THREE from '//unpkg.com/three/build/three.module.js'
+import { UnrealBloomPass } from '//unpkg.com/three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+import { Group, Matrix } from "./ts/cayley.js";
+
+// TODO: Add GUI to modify these plotting params
+
+function init_plot() {
+
+  const dom = document.getElementById('plot');
+  const plt = ForceGraph3D()
+    (dom)
+    .linkAutoColorBy(d => d.group)
+    .linkWidth(2)
+    .linkOpacity(0.7)
+    .nodeColor((n) => "rgb(255,255,255)")
+    .nodeOpacity(1)
+    .d3AlphaDecay(0.005);
+
+  const scene = plt.scene();
+  scene.fog = new THREE.Fog(0x004B45, 100, 1500);
+  
+  const bloomPass = new UnrealBloomPass();
+  bloomPass.strength = 0.7;
+  bloomPass.radius = 0.1;
+  bloomPass.threshold = 0.1;
+  plt.postProcessingComposer().addPass(bloomPass);
+
+  window.addEventListener('resize', () => {
+    plt.width(dom.clientWidth)
+      .height(dom.clientHeight);
+  }, false);
+
+  return [plt, scene];
+}
+
+function plot_group(plt, G) {
+  const graph_data = {
+    nodes: G.cayley.map((_, idx) => ({id: idx})),
+    links: G.cayley.map((n, idx) => n[1].map((m, jdx) => (
+      {
+        source: idx, 
+        target: m,
+        group: jdx
+      }
+    ))).reduce((a,b) => a.concat(b))
+  };
+  
+  plt.graphData(graph_data);
+}
+
+let fp, gmat;
+
+fp = 29;
+gmat = [
+
+[0,0,0,1,0,0,0,22,26,28,27,8,0,0,14,10,12,17,0,12,0,26,28,27,13,0,0,18,23,18,26,20,3,16,19,13,23,11,11,3,17,18,13,21,25,28,23,11,16],[20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20],[12,4,8,6,0,0,15,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,1,0,26,0,0,0,0,0,1,17] 
+
+].map((m) => new Matrix(m, fp));
+const G1 = new Group(gmat);
+
+fp = 3;
+gmat = [
+
+[2,2,2,1],[0,1,2,0]
+
+].map((m) => new Matrix(m, fp));
+const G2 = new Group(gmat);
+
+const [plt, scene] = init_plot();
+plot_group(plt, G2)
+
+window.plt = plt;
+window.plot = plot;
+window.G1 = G1;
 
 </script>
+</head>
+<body>
+<div id="plot"></div>
 </body>
 </html>

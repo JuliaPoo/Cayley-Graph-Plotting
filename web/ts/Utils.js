@@ -1,15 +1,7 @@
 import { assert } from "./Errors.js";
 export function isqrt(value) {
     assert(() => value >= 0, "Square root of negative numbers not supported");
-    if (value < 2)
-        return value;
-    const f = (n, x0) => {
-        const x1 = (n / x0 + x0) >> 1;
-        return x0 === x1 || x0 === x1 - 1
-            ? x0
-            : f(n, x1);
-    };
-    return f(value, 1);
+    return Math.floor(Math.sqrt(value));
 }
 export function is_perfect_square(value) {
     const s = isqrt(value);

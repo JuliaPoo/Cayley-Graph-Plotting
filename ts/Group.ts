@@ -1,6 +1,8 @@
 import { assert } from "./Errors";
 import { Matrix } from "./Matrix";
 
+export type CayleyGraph = [GroupElement, number[]][];
+
 export class Group {
   readonly gens: GroupElement[];
   readonly id: GroupElement;
@@ -30,6 +32,30 @@ export class Group {
 
   get ngen(): number {
     return this.gens.length;
+  }
+
+  get cayley(): CayleyGraph {
+    const graph: CayleyGraph = [[this.id, []]];
+    const visited: GroupElement[] = [this.id];
+    const stack: number[] = [0];
+    while (stack.length > 0) {
+      const nidx = stack.pop()!;
+      const [e, cs] = graph[nidx]!;
+
+      this.gens.forEach((g) => {
+        const h = e.mul(g);
+        const idx = visited.indexOf(h);
+        if (idx == -1) {
+          cs.push(graph.length);
+          stack.push(graph.length);
+          visited.push(h);
+          graph.push([h, []]);
+          return;
+        }
+        cs.push(idx);
+      });
+    }
+    return graph;
   }
 }
 
