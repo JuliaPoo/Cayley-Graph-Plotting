@@ -5,6 +5,14 @@ export function isqrt(value: number): number {
   return Math.floor(Math.sqrt(value));
 }
 
+export function gcd(a: number, b: number): number {
+  return b == 0 ? Math.abs(a) : gcd(b, a % b);
+}
+
+export function idiv(a: number, b: number): number {
+  return Math.floor(a / b);
+}
+
 export function is_perfect_square(value: number): boolean {
   const s = isqrt(value);
   return value == s * s;

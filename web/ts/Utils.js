@@ -3,6 +3,12 @@ export function isqrt(value) {
     assert(() => value >= 0, "Square root of negative numbers not supported");
     return Math.floor(Math.sqrt(value));
 }
+export function gcd(a, b) {
+    return b == 0 ? Math.abs(a) : gcd(b, a % b);
+}
+export function idiv(a, b) {
+    return Math.floor(a / b);
+}
 export function is_perfect_square(value) {
     const s = isqrt(value);
     return value == s * s;

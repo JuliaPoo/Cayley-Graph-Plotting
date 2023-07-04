@@ -1,5 +1,5 @@
 import { assert } from "./Errors";
-import { Matrix } from "./Matrix";
+import { Matrix, MatrixField } from "./Matrix";
 
 export type CayleyGraph = [GroupElement, number[]][];
 
@@ -7,7 +7,7 @@ export class Group {
   readonly gens: GroupElement[];
   readonly id: GroupElement;
   private readonly dim: number;
-  private readonly fp: number;
+  private readonly fp: MatrixField;
   readonly elements: Set<GroupElement>;
 
   constructor(matrep: Matrix[]) {
