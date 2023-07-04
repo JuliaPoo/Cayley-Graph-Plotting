@@ -24,7 +24,8 @@ export class Group {
             const nidx = stack.pop();
             const [e, cs] = graph[nidx];
             this.gens.forEach((g) => {
-                const h = e.mul(g);
+                // left multiplication
+                const h = g.mul(e);
                 const idx = visited.indexOf(h);
                 if (idx == -1) {
                     cs.push(graph.length);

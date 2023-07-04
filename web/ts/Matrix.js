@@ -48,7 +48,7 @@ export class Matrix {
                     return xq.mul(yq);
                 }
                 const [xz, yz] = [a, b];
-                return xz * yz;
+                return this.fp == "Z" ? xz * yz : (xz * yz) % this.fp;
             })
                 .reduce((a, b) => {
                 if (this.fp == "Q") {
