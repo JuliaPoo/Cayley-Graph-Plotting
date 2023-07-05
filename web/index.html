@@ -1,27 +1,29 @@
 <html>
 <head>
-<link rel="stylesheet" href="./css/main.css" />
-<script type="importmap">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./css/main.css" async/>
+<script type="importmap" async>
 {
   "imports": { "three": "https://unpkg.com/three/build/three.module.js" }
 }
 </script>
-<script src="//unpkg.com/3d-force-graph"></script>
+<script src="//unpkg.com/3d-force-graph" async></script>
 <script type="module">
 
-import * as THREE from '//unpkg.com/three/build/three.module.js'
 import { UnrealBloomPass } from '//unpkg.com/three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 import { Group, Matrix, Rational } from "./ts/cayley.js";
 
 // TODO: Add GUI to modify these plotting params
 // TODO: Allow user to make certain colours thicker
+// TODO: Allow user to toggle arrows
 
 function init_plot() {
 
-  const dom = document.getElementById('plot');
   const plt = ForceGraph3D()
-    (dom)
+    (PLOTINV)
+    .width(PLOT.clientWidth)
+    .height(PLOT.clientHeight)
     .linkAutoColorBy(d => d.group)
     .linkWidth(2)
     .linkOpacity(1)
@@ -30,7 +32,6 @@ function init_plot() {
     .d3AlphaDecay(0.005);
 
   const scene = plt.scene();
-  //scene.fog = new THREE.Fog(0x0, 100, 1500);
 
   const bloomPass = new UnrealBloomPass();
   bloomPass.strength = 0.7;
@@ -38,10 +39,10 @@ function init_plot() {
   bloomPass.threshold = 0.1;
   plt.postProcessingComposer().addPass(bloomPass);
 
-  window.addEventListener('resize', () => {
-    plt.width(dom.clientWidth)
-      .height(dom.clientHeight);
-  }, false);
+  new ResizeObserver(() => {
+    plt.width(PLOT.clientWidth)
+      .height(PLOT.clientHeight);
+  }).observe(PLOT);
 
   return [plt, scene];
 }
@@ -67,69 +68,40 @@ function create_group(gmat, fp) {
   )
 }
 
-function init_ui(group_listing, matrep) {
+function ui_init(group_listing, matrep) {
   const [plt, scene] = init_plot();
 
   window.plot_from_gid = (gid) => {
     const [gmat, fp] = matrep[gid];
-    console.log(gmat, fp)
     const G = create_group(gmat, fp);
-    console.log(G)
     plot_group(plt, G);
   }
+
+  plot_from_gid("60_8");
 }
 
-fetch("./rsrc/grouplisting.json").then(r => r.json())
-  .then(group_listing =>
-    fetch("./rsrc/matrep.json").then(r => r.json())
-      .then(matrep =>
-        init_ui(group_listing, matrep)
-      )
-  );
+const DATAURL = [
+  fetch("./rsrc/grouplisting.json"),
+  fetch("./rsrc/matrep.json")
+];
 
-/*
-let fp, gmat;
+const PLOT = document.getElementById('plot');
+const PLOTINV = document.getElementById('plot-invisible');
 
-fp = 29;
-gmat = [
-[0,0,0,1,0,0,0,22,26,28,27,8,0,0,14,10,12,17,0,12,0,26,28,27,13,0,0,18,23,18,26,20,3,16,19,13,23,11,11,3,17,18,13,21,25,28,23,11,16],[20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,20],[12,4,8,6,0,0,15,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,1,0,26,0,0,0,0,0,1,17]
-].map((m) => new Matrix(m, fp));
-const G1 = new Group(gmat);
+window.addEventListener("load", () =>
+  Promise.all(DATAURL)
+    .then((vs) =>
+      Promise.all(vs.map((r) => r.json())).then((vs) => {
+        const [group_listing, matrep] = vs;
+        ui_init(group_listing, matrep);
+      })
+    )
+);
 
-fp = 3;
-gmat = [
-[2,2,2,1],[0,1,2,0]
-].map((m) => new Matrix(m, fp));
-const G2 = new Group(gmat);
-
-const f = Rational.new;
-
-fp = "Q";
-gmat = [
-[[0,1],[0,1],[0,1],[1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[0,1]],[[0,1],[0,1],[1,1],[0,1],[0,1],[0,1],[0,1],[-1,1],[-1,1],[0,1],[0,1],[0,1],[0,1],[1,1],[0,1],[0,1]],[[-1,2],[-1,2],[-1,2],[-1,2],[1,2],[-1,2],[-1,2],[1,2],[1,2],[1,2],[-1,2],[-1,2],[1,2],[-1,2],[1,2],[-1,2]],[[0,1],[0,1],[0,1],[1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[0,1]],[[0,1],[1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[1,1],[0,1],[0,1],[1,1],[0,1]],[[1,1],[0,1],[0,1],[0,1],[0,1],[0,1],[1,1],[0,1],[0,1],[0,1],[0,1],[1,1],[0,1],[1,1],[0,1],[0,1]]
-].map((m) => new Matrix(m.map(f), fp))
-const G3 = new Group(gmat);
-
-const [plt, scene] = init_plot();
-plot_group(plt, G2)
-
-fp = "Q";
-gmat = [
-[[0,1],[0,1],[0,1],[1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[0,1]],[[0,1],[0,1],[0,1],[1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[0,1]],[[0,1],[1,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[-1,1],[0,1],[0,1],[1,1],[0,1]],[[-1,2],[-1,2],[1,2],[-1,2],[1,2],[-1,2],[1,2],[1,2],[-1,2],[-1,2],[-1,2],[1,2],[1,2],[-1,2],[-1,2],[-1,2]],[[-1,2],[1,2],[-1,2],[1,2],[1,2],[1,2],[-1,2],[-1,2],[-1,2],[-1,2],[-1,2],[-1,2],[1,2],[-1,2],[-1,2],[1,2]]
-].map((m) => new Matrix(m.map(f), fp))
-const G4 = new Group(gmat);
-
-
-window.plt = plt;
-window.plot = plot_group;
-window.G1 = G1;
-window.G2 = G2;
-window.G3 = G3;
-window.G4 = G4;
-*/
 </script>
 </head>
 <body>
-  <div id="plot"></div>
+  <div id="groupsearch"></div>
+  <div id="plot"><div id="plot-invisible"></div></div>
 </body>
 </html>
