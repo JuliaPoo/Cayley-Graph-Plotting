@@ -1,5 +1,5 @@
 [attr]generated linguist-generated=true diff=generated
 
-gh-pages/ts/*    generated
-gh-pages/ts/**/* generated
+docs/ts/*    generated
+docs/ts/**/* generated
 package-lock.json generated

@@ -21,8 +21,8 @@
   },
   "scripts": {
     "watch-ts": "nodemon",
-    "build": "rimraf ./gh-pages/js && tsc-esm",
-    "start": "npm run build && http-server gh-pages -p 9999 -o ."
+    "build": "rimraf ./docs/js && tsc-esm",
+    "start": "npm run build && http-server docs -p 9999 -o ."
   },
   "author": "JuliaPoo",
   "license": "ISC"
