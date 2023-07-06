@@ -89,11 +89,15 @@ body {
     color: white;
 
     display: grid;
-    grid-template-columns: 20% auto;
+    grid-template-columns: 30% auto;
 }
 
 .group-listing:hover {
     background-color: #B51770;
+}
+
+.group-listing-selected {
+    background-color: #01766b;
 }
 
 .group-listing > p {
@@ -110,8 +114,21 @@ body {
 
 .group-listing-desc {
     font-size: 0.8em;
-    
+    vertical-align: middle;
     grid-column-start: 2;
+}
+
+#end-result {
+    width: 100%;
+
+    display: flex;
+}
+
+#end-result-text {
+    width: 100%;
+    background-color: rgb(51, 13, 89);
+    text-align: center;
+    align-items: stretch;
 }
 
 #plot {

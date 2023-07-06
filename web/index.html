@@ -17,6 +17,22 @@ import { Group, Matrix, Rational } from "./ts/cayley.js";
 // TODO: Add GUI to modify these plotting params
 // TODO: Allow user to make certain colours thicker
 // TODO: Allow user to toggle arrows
+// TODO: Add info + credits
+//    - What groups are indexed
+
+const DATAURL = [
+  fetch("./rsrc/grouplisting.json"),
+  fetch("./rsrc/matrep.json")
+];
+const FILTER = document.getElementById("filter");
+const DEGREE = document.getElementById("degree");
+const RESULTBOX = document.getElementById("groupsearch-results-box");
+const NRESULT = 100;
+
+const PLOT = document.getElementById('plot');
+const PLOTINV = document.getElementById('plot-invisible');
+
+let ACTIVEGID = undefined;
 
 function init_plot() {
 
@@ -73,29 +89,112 @@ function plot_group(plt, G) {
 
 function create_group(gmat, fp) {
   return new Group(
-    gmat.map((m) => new Matrix(fp == "Q" ? m.map(Rational.new) : m, fp))
+    gmat.map((m) => new Matrix(fp === "Q" ? m.map(Rational.new) : m, fp))
   )
+}
+
+function create_end_listing(text) {
+  /*
+  <div class="group-listing" id="end-result">
+    <p id="end-result-text">--End--</p>
+  </div>
+  */
+  const p = document.createElement("p");
+  p.appendChild(document.createTextNode(text));
+  p.id = "end-result-text";
+  const end = document.createElement("div");
+  end.id = "end-result";
+  end.classList.add("group-listing");
+  end.appendChild(p)
+  
+  RESULTBOX.appendChild(end);
+}
+
+function empty_listing() {
+  while (RESULTBOX.firstChild) {
+    RESULTBOX.removeChild(RESULTBOX.lastChild);
+  }
+}
+
+function add_listing(ginfo) {
+  /*
+  <div class="group-listing">
+    <p class="group-listing-name">Group</p>
+    <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+  </div>
+  */
+  const [_1, link, name, desc, _2, gid] = ginfo;
+  
+  const p1 = document.createElement("p");
+  p1.classList.add("group-listing-name");
+  p1.innerHTML = name;
+
+  const p2 = document.createElement("p");
+  p2.classList.add("group-listing-desc");
+  p2.innerHTML = desc;
+
+  const item = document.createElement("div");
+  item.classList.add("group-listing");
+  item.id = gid;
+
+  item.appendChild(p1);
+  item.appendChild(p2);
+
+  item.addEventListener("click", () => {
+    window.plot_from_gid(gid)
+  })
+
+  RESULTBOX.appendChild(item);
+}
+
+function highlight_activegid() {
+  RESULTBOX.childNodes.forEach((c) => {
+    const sel = "group-listing-selected";
+    if (c.id === ACTIVEGID) {
+      c.classList.add(sel);
+      return;
+    }
+    c.classList.contains(sel);
+    c.classList.remove(sel)
+  })
 }
 
 function ui_init(group_listing, matrep) {
   const [plt, scene] = init_plot();
 
   window.plot_from_gid = (gid) => {
+    ACTIVEGID = gid;
     const [gmat, fp] = matrep[gid];
     const G = create_group(gmat, fp);
     plot_group(plt, G);
+    highlight_activegid();
   }
 
-  plot_from_gid("60_8");
+  
+  const create_group_listing = () => {
+    const f = FILTER.value.toLowerCase();
+    const d = parseInt(DEGREE.value);
+    
+    let result = group_listing; 
+    if (!isNaN(d))
+      result = result.filter((ginfo) => ginfo[0] == d);
+    result = result.filter((ginfo) => {
+      const str = (ginfo[3] + ginfo[4]).toLowerCase();
+      return f.split(" ").some((w) => str.includes(w))
+    });
+
+    // TODO: Highlight the matched text
+    empty_listing();
+    result.slice(0, NRESULT).forEach(add_listing);
+    create_end_listing(result.length > NRESULT 
+      ? `Truncated ${NRESULT}/${result.length}`
+      : "~~ End ~~");
+    highlight_activegid();
+  }
+  create_group_listing();
+  FILTER.addEventListener("input", create_group_listing);
+  DEGREE.addEventListener("input", create_group_listing);
 }
-
-const DATAURL = [
-  fetch("./rsrc/grouplisting.json"),
-  fetch("./rsrc/matrep.json")
-];
-
-const PLOT = document.getElementById('plot');
-const PLOTINV = document.getElementById('plot-invisible');
 
 window.addEventListener("load", () =>
   Promise.all(DATAURL)
@@ -121,68 +220,8 @@ window.addEventListener("load", () =>
       <div id="groupsearch-results">
         <div id="groupsearch-results-invisible">
         <div id="groupsearch-results-box">
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
-        </div>
-        <div class="group-listing">
-          <p class="group-listing-name">Group</p>
-          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
         </div>
         </div>
-      </div>
       </div>
   </div>
   <div id="plot"><div id="plot-invisible"></div></div>
