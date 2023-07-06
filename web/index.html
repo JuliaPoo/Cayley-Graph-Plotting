@@ -44,6 +44,15 @@ function init_plot() {
       .height(PLOT.clientHeight);
   }).observe(PLOT);
 
+  const group_listing = document.getElementById("groupsearch-results");
+  const group_listing_box = document.getElementById("groupsearch-results-box");
+  const group_listing_sizing = () => {
+    group_listing_box.style.height = `${group_listing.clientHeight}px`;
+    group_listing_box.style.width = `${group_listing.clientWidth}px`;
+  }
+  group_listing_sizing();
+  new ResizeObserver(group_listing_sizing).observe(group_listing);
+
   return [plt, scene];
 }
 
@@ -101,7 +110,81 @@ window.addEventListener("load", () =>
 </script>
 </head>
 <body>
-  <div id="groupsearch"></div>
+  <div id="groupsearch">
+      <div id="groupsearch-ui">
+        <label for="filter">Filter: </label>
+        <input type="text" id="filter">
+        <br>
+        <label for="degree">Degree: </label>
+        <input type="number" id="degree" min="0" max="500">
+      </div>
+      <div id="groupsearch-results">
+        <div id="groupsearch-results-invisible">
+        <div id="groupsearch-results-box">
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        <div class="group-listing">
+          <p class="group-listing-name">Group</p>
+          <p class="group-listing-desc">Desc Desc Desc Desc Desc Desc Desc Desc Desc Desc </p>
+        </div>
+        </div>
+      </div>
+      </div>
+  </div>
   <div id="plot"><div id="plot-invisible"></div></div>
 </body>
 </html>
