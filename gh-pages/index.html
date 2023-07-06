@@ -19,6 +19,7 @@ import { Group, Matrix, Rational } from "./ts/cayley.js";
 // TODO: Allow user to toggle arrows
 // TODO: Add info + credits
 //    - What groups are indexed
+// TODO: Add icon
 
 const DATAURL = [
   fetch("./rsrc/grouplisting.json"),
@@ -175,7 +176,7 @@ function ui_init(group_listing, matrep) {
     const f = FILTER.value.toLowerCase();
     const d = parseInt(DEGREE.value);
     
-    let result = group_listing; 
+    let result = group_listing.slice(1); 
     if (!isNaN(d))
       result = result.filter((ginfo) => ginfo[0] == d);
     result = result.filter((ginfo) => {
