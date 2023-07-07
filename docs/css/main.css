@@ -68,12 +68,11 @@ body {
 #groupsearch-ui > input {
     background: black;
     color: white;
-    width: 100%;
-    padding: 0.5em;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+    width: calc(100% - 7em);
+    padding: 0.3em;
+    margin-top: 0.3em;
 
-    border-radius: 1em;
+    border-radius: 0.5em;
 }
 
 #groupsearch-ui > input:focus {
@@ -124,6 +123,8 @@ body {
 .group-listing-name {
     font-size: 1.2em;
     text-align: center;
+    vertical-align: middle;
+    margin: 0.2em;
 
     grid-column-start: 1;
 }
@@ -138,6 +139,7 @@ body {
     width: 100%;
 
     display: flex;
+    cursor: initial;
 }
 
 #end-result-text {
