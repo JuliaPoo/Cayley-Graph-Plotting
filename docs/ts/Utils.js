@@ -1,6 +1,6 @@
 import { assert } from "./Errors.js";
 export function isqrt(value) {
-    assert(() => value >= 0, "Square root of negative numbers not supported");
+    assert(value >= 0, "Square root of negative numbers not supported");
     return Math.floor(Math.sqrt(value));
 }
 export function gcd(a, b) {

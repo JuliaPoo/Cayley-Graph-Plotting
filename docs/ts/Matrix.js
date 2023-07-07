@@ -5,7 +5,7 @@ export class Matrix {
     constructor(mat, fp) {
         this.mat = mat;
         this.fp = fp;
-        assert(() => is_perfect_square(mat.length), "Generators aren't isn't a square matrix");
+        assert(is_perfect_square(mat.length), "Generators aren't isn't a square matrix");
     }
     get dim() {
         return isqrt(this.mat.length);
@@ -24,7 +24,7 @@ export class Matrix {
         }), fp);
     }
     add(o) {
-        assert(() => o.fp == this.fp, "Adding matrices of different fp");
+        assert(o.fp == this.fp, "Adding matrices of different fp");
         const f = this.fp == "Q"
             ? (r) => r[0].add(r[1])
             : this.fp == "Z"
@@ -33,39 +33,45 @@ export class Matrix {
         return new Matrix(zip(o.mat, this.mat).map(f), this.fp);
     }
     mul(o) {
-        assert(() => o.fp == this.fp, "Multiplying matrices of different fp");
+        assert(o.fp == this.fp, "Multiplying matrices of different fp");
         const d = this.dim;
-        const f3 = this.fp == "Q"
-            ? (a, b) => a.add(b)
-            : this.fp == "Z"
-                ? (a, b) => a + b
-                : (a, b) => (a + b) % this.fp;
-        const f2 = this.fp == "Q"
-            ? (x, y) => (j) => {
-                const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
-                const [xq, yq] = [a, b];
-                return xq.mul(yq);
-            }
-            : this.fp == "Z"
-                ? (x, y) => (j) => {
-                    const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
-                    const [xz, yz] = [a, b];
-                    return xz * yz;
+        if (this.fp == "Q") {
+            const new_mat = new Array(d * d);
+            for (let i = 0; i < d * d; i++) {
+                const x = i % d;
+                const y = Math.floor(i / d);
+                let s = Rational.zero;
+                for (let j = 0; j < d; j++) {
+                    s = s.add(this.mat[y * d + j].mul(o.mat[x + j * d]));
                 }
-                : (x, y) => (j) => {
-                    const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
-                    const [xz, yz] = [a, b];
-                    return (xz * yz) % this.fp;
-                };
-        const f1 = (i) => {
+                new_mat[i] = s;
+            }
+            return new Matrix(new_mat, this.fp);
+        }
+        if (this.fp == "Z") {
+            const new_mat = new Array(d * d);
+            for (let i = 0; i < d * d; i++) {
+                const x = i % d;
+                const y = Math.floor(i / d);
+                let s = 0;
+                for (let j = 0; j < d; j++) {
+                    s += this.mat[y * d + j] * o.mat[x + j * d];
+                }
+                new_mat[i] = s;
+            }
+            return new Matrix(new_mat, this.fp);
+        }
+        const new_mat = new Array(d * d);
+        for (let i = 0; i < d * d; i++) {
             const x = i % d;
             const y = Math.floor(i / d);
-            const f2_ = f2(x, y);
-            return range(0, d)
-                .map(f2_)
-                .reduce(f3);
-        };
-        return new Matrix(range(0, d * d).map(f1), this.fp);
+            let s = 0;
+            for (let j = 0; j < d; j++) {
+                s += this.mat[y * d + j] * o.mat[x + j * d];
+            }
+            new_mat[i] = s % this.fp;
+        }
+        return new Matrix(new_mat, this.fp);
     }
     equal(o) {
         return (o.fp == this.fp &&

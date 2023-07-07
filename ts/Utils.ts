@@ -1,7 +1,7 @@
 import { assert } from "./Errors";
 
 export function isqrt(value: number): number {
-  assert(() => value >= 0, "Square root of negative numbers not supported");
+  assert(value >= 0, "Square root of negative numbers not supported");
   return Math.floor(Math.sqrt(value));
 }
 

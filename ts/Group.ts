@@ -11,13 +11,13 @@ export class Group {
   readonly elements: Set<GroupElement>;
 
   constructor(matrep: Matrix[]) {
-    assert(() => matrep.length > 0, "Matrix has no generators");
+    assert(matrep.length > 0, "Matrix has no generators");
     assert(
-      () => matrep.every((m) => m.dim == matrep[0]!.dim),
+      matrep.every((m) => m.dim == matrep[0]!.dim),
       "Generators are matrices of different size"
     );
     assert(
-      () => matrep.every((m) => m.fp == matrep[0]!.fp),
+      matrep.every((m) => m.fp == matrep[0]!.fp),
       "Generators are matrices of different fp"
     );
     this.gens = matrep.map((m) => new GroupElement(this, m));
@@ -64,7 +64,7 @@ export class GroupElement {
   constructor(readonly grp: Group, readonly mat: Matrix) {}
 
   mul(o: GroupElement): GroupElement {
-    assert(() => this.grp == o.grp, "Multiplying elements of different groups");
+    assert(this.grp == o.grp, "Multiplying elements of different groups");
 
     const g = new GroupElement(this.grp, this.mat.mul(o.mat));
     for (const e of this.grp.elements.values()) if (e.equal(g)) return e;
@@ -74,7 +74,7 @@ export class GroupElement {
   }
 
   private equal(o: GroupElement) {
-    assert(() => this.grp == o.grp, "Comparing elements of different groups");
+    assert(this.grp == o.grp, "Comparing elements of different groups");
     return this.mat.equal(o.mat);
   }
 }
