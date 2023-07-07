@@ -266,3 +266,8 @@ body {
 #info-toggle:checked ~ #info-screen {
     display: initial;
 }
+
+#ui-control {
+    position: absolute;
+    right: 0;
+}

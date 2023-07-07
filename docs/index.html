@@ -1,5 +1,7 @@
 <html>
 <head>
+<title>Cayley Graphs | JuliaPoo</title>
+<link rel="icon" type="image/x-icon" href="/rsrc/android-chrome-192x192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="./css/main.css" async/>
 <script type="importmap" async>
@@ -7,11 +9,11 @@
   "imports": { "three": "https://unpkg.com/three/build/three.module.js" }
 }
 </script>
+<script type="text/javascript" src="//unpkg.com/dat.gui@0.7.6/build/dat.gui.js" async></script>
 <script src="//unpkg.com/3d-force-graph" async></script>
 <script type="module">
 
 import { UnrealBloomPass } from '//unpkg.com/three/examples/jsm/postprocessing/UnrealBloomPass.js';
-
 import { Group, Matrix, Rational } from "./ts/cayley.js";
 
 // TODO: Add GUI to modify these plotting params
@@ -34,8 +36,14 @@ const PLOT = document.getElementById('plot');
 const PLOTINV = document.getElementById('plot-invisible');
 
 const GROUPNAMESURL = "https://people.maths.bris.ac.uk/~matyd/GroupNames/";
+const UIPARAMS = {};
 
 let ACTIVEGID = undefined;
+
+const BLOOMPASS = new UnrealBloomPass();
+BLOOMPASS.strength = 0.5;
+BLOOMPASS.radius = 0.1;
+BLOOMPASS.threshold = 0.1;
 
 function init_plot() {
 
@@ -51,12 +59,7 @@ function init_plot() {
     .d3AlphaDecay(0.005);
 
   const scene = plt.scene();
-
-  const bloomPass = new UnrealBloomPass();
-  bloomPass.strength = 0.7;
-  bloomPass.radius = 0.1;
-  bloomPass.threshold = 0.1;
-  plt.postProcessingComposer().addPass(bloomPass);
+  plt.postProcessingComposer().addPass(BLOOMPASS);
 
   new ResizeObserver(() => {
     plt.width(PLOT.clientWidth)
@@ -169,13 +172,50 @@ function highlight_activegid() {
 
 function ui_init(group_listing, matrep) {
   const [plt, scene] = init_plot();
+  const gui = new dat.GUI({autoPlace: false});
+  PLOT.appendChild(gui.domElement);
+  gui.domElement.id = "ui-control";
+  const linkVis = gui.addFolder('linkVisibility');
+  linkVis.open();
+  const linkArrows = gui.addFolder('linkArrows');
+  linkArrows.open();
 
   window.plot_from_gid = (gid) => {
+
     ACTIVEGID = gid;
     const [gmat, fp] = matrep[gid];
     const G = create_group(gmat, fp);
     plot_group(plt, G);
     highlight_activegid();
+
+    while (linkVis.__controllers.length > 0)
+      linkVis.__controllers[0].remove();
+    while (linkArrows.__controllers.length > 0)
+      linkArrows.__controllers[0].remove();
+
+    new Array(G.gens.length).fill(true)
+      .forEach((v, idx) => {
+        UIPARAMS[`linkVisibility #${idx}`] = v;
+        UIPARAMS[`linkArrows #${idx}`] = 0;
+      });
+    UIPARAMS[`arrowPos`] = 0.5;
+
+    new Array(G.gens.length).fill(1).forEach(
+      (_, idx) => {
+        linkVis
+          .add(UIPARAMS, `linkVisibility #${idx}`, true)
+          .onChange(() =>
+            plt.linkVisibility(d => UIPARAMS[`linkVisibility #${d.group}`])
+          );
+        linkArrows
+          .add(UIPARAMS, `linkArrows #${idx}`, 0, 30, 0.01)
+          .onChange(() =>
+            plt.linkDirectionalArrowLength(d => UIPARAMS[`linkArrows #${d.group}`])
+          );
+      }
+    );
+    linkArrows.add(UIPARAMS, `arrowPos`, 0, 1, 0.01)
+      .onChange(() => plt.linkDirectionalArrowRelPos(UIPARAMS[`arrowPos`]))
   }
 
   
