@@ -82,6 +82,7 @@ body {
 
 #groupsearch-results {
     min-height: 10em;
+    border-bottom: 1px white solid;
 
     flex-grow: 5;
     order: 1;
@@ -108,6 +109,7 @@ body {
 
 .group-listing:hover {
     background-color: #B51770;
+    cursor: pointer;
 }
 
 .group-listing-selected {
@@ -127,7 +129,7 @@ body {
 }
 
 .group-listing-desc {
-    font-size: 0.8em;
+    font-size: 0.9em;
     vertical-align: middle;
     grid-column-start: 2;
 }
@@ -157,4 +159,92 @@ body {
 #plot-invisible {
     width: 0;
     height: 0;
+}
+
+#info {
+    position: absolute;
+    right: 1em;
+    bottom: 1em;
+    z-index: 100;
+}
+
+.gg-info {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(2);
+    width: 20px;
+    height: 20px;
+    border: white 2px solid;
+    border-radius: 40px
+}
+.gg-info::after,
+.gg-info::before {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    border-radius: 3px;
+    width: 2px;
+    background: white;
+    left: 7px
+}
+.gg-info::after {
+    bottom: 2px;
+    height: 8px
+}
+.gg-info::before {
+    height: 2px;
+    top: 2px
+}
+
+.gg-info:hover {
+    cursor: pointer;
+    border: #01fdc7 2px solid;
+    box-shadow: 0 0 0.5em #01fdc6,0 0 0.6em rgba(1,253,198,0.7),0 0 0.8em rgba(1,253,198,0.5),0 0 1.2em rgba(1,253,198,0.3),0 0 1.8em rgba(1,253,198,0.2),0 0 2.5em rgba(1,253,198,0.1);
+}
+
+.gg-info:hover::after,
+.gg-info:hover::before {
+    background: #01fdc7;
+}
+
+#info-toggle:checked ~ label .gg-info {
+    border-color: cyan;
+    box-shadow: 0 0 0.5em #01fdc6,0 0 0.6em rgba(1,253,198,0.7),0 0 0.8em rgba(1,253,198,0.5),0 0 1.2em rgba(1,253,198,0.3),0 0 1.8em rgba(1,253,198,0.2),0 0 2.5em rgba(1,253,198,0.1);
+}
+
+#info-toggle:checked ~ label .gg-info::after,
+#info-toggle:checked ~ label .gg-info::before {
+    background: pink;
+}
+
+#info-toggle {
+    position: absolute;
+    left: -100vw;
+}
+
+#info-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2em;
+    
+    background: rgba(0,20,49,0.5);
+    backdrop-filter: blur(10px);
+
+    width: calc(min(40em, 70%));
+    max-width: 40em;
+    max-height: 70%;
+    display: none;
+
+    overflow-y: auto;
+
+    color: white;
+    border: yellow 2px solid;
+}
+
+#info-toggle:checked ~ #info-screen {
+    display: initial;
 }
