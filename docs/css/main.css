@@ -172,7 +172,7 @@ body {
     box-sizing: border-box;
     position: relative;
     display: block;
-    transform: scale(2);
+    transform: scale(1.5);
     width: 20px;
     height: 20px;
     border: white 2px solid;
