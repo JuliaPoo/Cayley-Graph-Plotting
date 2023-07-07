@@ -244,7 +244,7 @@ body {
     overflow-y: auto;
 
     color: white;
-    border: yellow 2px solid;
+    border: cyan 2px solid;
 }
 
 #info-toggle:checked ~ #info-screen {
