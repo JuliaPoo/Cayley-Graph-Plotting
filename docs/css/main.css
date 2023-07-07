@@ -16,6 +16,20 @@
     background-color: rgba(1,253,198,0.9)
 }
 
+a {
+    text-decoration: none;
+    color: #00d2f7
+}
+
+a:not(.nohover):hover {
+    text-shadow: 0 0 0.2em #01fdc7,0 0 0.25em rgba(1,253,199,0.7),0 0 0.3em rgba(1,253,199,0.5),0 0 0.4em rgba(1,253,199,0.3),0 0 0.6em rgba(1,253,199,0.2),0 0 1em rgba(1,253,199,0.1);
+    color: #01fdc7
+}
+
+a:visited {
+    color: #ff6b83
+}
+
 body {
     position: fixed;
     left: 0;

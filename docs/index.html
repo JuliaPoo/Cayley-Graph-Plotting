@@ -28,10 +28,12 @@ const DATAURL = [
 const FILTER = document.getElementById("filter");
 const DEGREE = document.getElementById("degree");
 const RESULTBOX = document.getElementById("groupsearch-results-box");
-const NRESULT = 100;
+const NRESULT = 200;
 
 const PLOT = document.getElementById('plot');
 const PLOTINV = document.getElementById('plot-invisible');
+
+const GROUPNAMESURL = "https://people.maths.bris.ac.uk/~matyd/GroupNames/";
 
 let ACTIVEGID = undefined;
 
@@ -130,6 +132,10 @@ function add_listing(ginfo) {
   p1.classList.add("group-listing-name");
   p1.innerHTML = name;
 
+  const a = document.createElement("a");
+  a.href = `${GROUPNAMESURL}${link}`;
+  a.appendChild(p1);
+
   const p2 = document.createElement("p");
   p2.classList.add("group-listing-desc");
   p2.innerHTML = desc;
@@ -138,7 +144,7 @@ function add_listing(ginfo) {
   item.classList.add("group-listing");
   item.id = gid;
 
-  item.appendChild(p1);
+  item.appendChild(a);
   item.appendChild(p2);
 
   item.addEventListener("click", () => {
