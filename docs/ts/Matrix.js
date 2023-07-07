@@ -25,51 +25,80 @@ export class Matrix {
     }
     add(o) {
         assert(() => o.fp == this.fp, "Adding matrices of different fp");
-        return new Matrix(zip(o.mat, this.mat).map((r) => {
-            if (this.fp == "Q") {
+        return new Matrix(this.fp == "Q"
+            ? zip(o.mat, this.mat).map((r) => {
                 const rq = r;
                 return rq[0].add(rq[1]);
-            }
-            const rz = r;
-            return this.fp == "Z" ? rz[0] + rz[1] : (rz[0] + rz[1]) % this.fp;
-        }), this.fp);
+            })
+            : this.fp == "Z"
+                ? zip(o.mat, this.mat).map((r) => {
+                    const rz = r;
+                    return rz[0] + rz[1];
+                })
+                : zip(o.mat, this.mat).map((r) => {
+                    const rz = r;
+                    return (rz[0] + rz[1]) % this.fp;
+                }), this.fp);
     }
     mul(o) {
         assert(() => o.fp == this.fp, "Multiplying matrices of different fp");
         const d = this.dim;
-        return new Matrix(range(0, d * d).map((i) => {
-            const x = i % d;
-            const y = Math.floor(i / d);
-            return range(0, d)
-                .map((j) => {
-                const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
-                if (this.fp == "Q") {
+        return new Matrix(this.fp == "Q"
+            ? range(0, d * d).map((i) => {
+                const x = i % d;
+                const y = Math.floor(i / d);
+                return range(0, d)
+                    .map((j) => {
+                    const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
                     const [xq, yq] = [a, b];
                     return xq.mul(yq);
-                }
-                const [xz, yz] = [a, b];
-                return this.fp == "Z" ? xz * yz : (xz * yz) % this.fp;
-            })
-                .reduce((a, b) => {
-                if (this.fp == "Q") {
+                })
+                    .reduce((a, b) => {
                     const [aq, bq] = [a, b];
                     return aq.add(bq);
-                }
-                const [az, bz] = [a, b];
-                return this.fp == "Z" ? az + bz : (az + bz) % this.fp;
-            });
-        }), this.fp);
+                });
+            })
+            : this.fp == "Z"
+                ? range(0, d * d).map((i) => {
+                    const x = i % d;
+                    const y = Math.floor(i / d);
+                    return range(0, d)
+                        .map((j) => {
+                        const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
+                        const [xz, yz] = [a, b];
+                        return xz * yz;
+                    })
+                        .reduce((a, b) => {
+                        const [az, bz] = [a, b];
+                        return az + bz;
+                    });
+                })
+                : range(0, d * d).map((i) => {
+                    const x = i % d;
+                    const y = Math.floor(i / d);
+                    return range(0, d)
+                        .map((j) => {
+                        const [a, b] = [this.mat[y * d + j], o.mat[x + j * d]];
+                        const [xz, yz] = [a, b];
+                        return (xz * yz) % this.fp;
+                    })
+                        .reduce((a, b) => {
+                        const [az, bz] = [a, b];
+                        return (az + bz) % this.fp;
+                    });
+                }), this.fp);
     }
     equal(o) {
         return (o.fp == this.fp &&
             o.mat.length == this.mat.length &&
-            zip(o.mat, this.mat).every((r) => {
-                if (this.fp == "Q") {
+            (this.fp == "Q"
+                ? zip(o.mat, this.mat).every((r) => {
                     const rq = r;
                     return rq[0].equal(rq[1]);
-                }
-                const rz = r;
-                return rz[0] == rz[1];
-            }));
+                })
+                : zip(o.mat, this.mat).every((r) => {
+                    const rz = r;
+                    return rz[0] == rz[1];
+                })));
     }
 }
