@@ -36,21 +36,16 @@ export class Matrix {
 
   add(o: Matrix): Matrix {
     assert(() => o.fp == this.fp, "Adding matrices of different fp");
-    return new Matrix(
+    const f =
       this.fp == "Q"
-        ? zip(o.mat, this.mat).map((r) => {
-            const rq = r as [Rational, Rational];
-            return rq[0].add(rq[1]);
-          })
+        ? (r: [Rational, Rational]) => r[0].add(r[1])
         : this.fp == "Z"
-        ? zip(o.mat, this.mat).map((r) => {
-            const rz = r as [number, number];
-            return rz[0] + rz[1];
-          })
-        : zip(o.mat, this.mat).map((r) => {
-            const rz = r as [number, number];
-            return (rz[0] + rz[1]) % (this.fp as number);
-          }),
+        ? (r: [number, number]) => r[0] + r[1]
+        : (r: [number, number]) => (r[0] + r[1]) % (this.fp as number);
+    return new Matrix(
+      zip(o.mat as number[], this.mat as number[]).map(
+        f as (r: [number, number]) => number
+      ),
       this.fp
     );
   }
@@ -58,53 +53,40 @@ export class Matrix {
   mul(o: Matrix): Matrix {
     assert(() => o.fp == this.fp, "Multiplying matrices of different fp");
     const d = this.dim;
-    return new Matrix(
+    const f3 =
       this.fp == "Q"
-        ? range(0, d * d).map((i) => {
-            const x = i % d;
-            const y = Math.floor(i / d);
-            return range(0, d)
-              .map((j) => {
-                const [a, b] = [this.mat[y * d + j]!, o.mat[x + j * d]!];
-                const [xq, yq] = [a as Rational, b as Rational];
-                return xq.mul(yq);
-              })
-              .reduce((a, b) => {
-                const [aq, bq] = [a as Rational, b as Rational];
-                return aq.add(bq);
-              });
-          })
+        ? (a: Rational, b: Rational) => a.add(b)
         : this.fp == "Z"
-        ? range(0, d * d).map((i) => {
-            const x = i % d;
-            const y = Math.floor(i / d);
-            return range(0, d)
-              .map((j) => {
-                const [a, b] = [this.mat[y * d + j]!, o.mat[x + j * d]!];
-                const [xz, yz] = [a as number, b as number];
-                return xz * yz;
-              })
-              .reduce((a, b) => {
-                const [az, bz] = [a as number, b as number];
-                return az + bz;
-              });
-          })
-        : range(0, d * d).map((i) => {
-            const x = i % d;
-            const y = Math.floor(i / d);
-            return range(0, d)
-              .map((j) => {
-                const [a, b] = [this.mat[y * d + j]!, o.mat[x + j * d]!];
-                const [xz, yz] = [a as number, b as number];
-                return (xz * yz) % (this.fp as number);
-              })
-              .reduce((a, b) => {
-                const [az, bz] = [a as number, b as number];
-                return (az + bz) % (this.fp as number);
-              });
-          }),
-      this.fp
-    );
+        ? (a: number, b: number) => a + b
+        : (a: number, b: number) => (a + b) % (this.fp as number);
+    const f2 =
+      this.fp == "Q"
+        ? (x: number, y: number) => (j: number) => {
+            const [a, b] = [this.mat[y * d + j]!, o.mat[x + j * d]!];
+            const [xq, yq] = [a as Rational, b as Rational];
+            return xq.mul(yq);
+          }
+        : this.fp == "Z"
+        ? (x: number, y: number) => (j: number) => {
+            const [a, b] = [this.mat[y * d + j]!, o.mat[x + j * d]!];
+            const [xz, yz] = [a as number, b as number];
+            return xz * yz;
+          }
+        : (x: number, y: number) => (j: number) => {
+            const [a, b] = [this.mat[y * d + j]!, o.mat[x + j * d]!];
+            const [xz, yz] = [a as number, b as number];
+            return (xz * yz) % (this.fp as number);
+          };
+    const f1 = (i: number) => {
+      const x = i % d;
+      const y = Math.floor(i / d);
+      const f2_ = f2(x, y);
+      return range(0, d)
+        .map(f2_ as (j: number) => number)
+        .reduce(f3 as (a: number, b: number) => number);
+    };
+
+    return new Matrix(range(0, d * d).map(f1), this.fp);
   }
 
   equal(o: Matrix): boolean {
