@@ -247,6 +247,16 @@ body {
     border: cyan 2px solid;
 }
 
+#info-screen h1 {
+    text-shadow: 0 0 0.2em #01fdc7,0 0 0.25em rgba(1,253,199,0.7),0 0 0.3em rgba(1,253,199,0.5),0 0 0.4em rgba(1,253,199,0.3),0 0 0.6em rgba(1,253,199,0.2),0 0 1em rgba(1,253,199,0.1);
+}
+
+#info-screen h2,
+#info-screen h3,
+#info-screen h4 {
+    text-shadow: 0 0 0.2em #e18ce4,0 0 0.25em rgba(247,101,252,0.7),0 0 0.3em rgba(247,101,252,0.5),0 0 0.4em rgba(247,101,252,0.3),0 0 0.6em rgba(247,101,252,0.2),0 0 1em rgba(247,101,252,0.1);
+}
+
 #info-toggle:checked ~ #info-screen {
     display: initial;
 }
