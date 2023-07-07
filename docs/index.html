@@ -134,6 +134,7 @@ function add_listing(ginfo) {
 
   const a = document.createElement("a");
   a.href = `${GROUPNAMESURL}${link}`;
+  a.target = "_blank";
   a.appendChild(p1);
 
   const p2 = document.createElement("p");
@@ -187,7 +188,7 @@ function ui_init(group_listing, matrep) {
       result = result.filter((ginfo) => ginfo[0] == d);
     result = result.filter((ginfo) => {
       const str = (ginfo[3] + ginfo[4]).toLowerCase();
-      return f.split(" ").some((w) => str.includes(w))
+      return f.split(" ").every((w) => str.includes(w))
     });
 
     // TODO: Highlight the matched text
