@@ -90,7 +90,14 @@ function plot_group(plt, G) {
     ))).reduce((a,b) => a.concat(b))
   };
 
-  plt.graphData(graph_data);
+  plt  
+    .linkDirectionalArrowLength(d => {
+      const g = G.gens[d.group];
+      return g.mul(g) == G.id
+        ? 0
+        : 15
+    })
+    .graphData(graph_data);
 }
 
 function create_group(gmat, fp) {
@@ -131,14 +138,14 @@ function add_listing(ginfo) {
   */
   const [_1, link, name, desc, _2, gid] = ginfo;
   
-  const p1 = document.createElement("p");
-  p1.classList.add("group-listing-name");
-  p1.innerHTML = name;
-
   const a = document.createElement("a");
   a.href = `${GROUPNAMESURL}${link}`;
   a.target = "_blank";
-  a.appendChild(p1);
+  a.innerHTML = name;
+
+  const p1 = document.createElement("p");
+  p1.classList.add("group-listing-name");
+  p1.appendChild(a);
 
   const p2 = document.createElement("p");
   p2.classList.add("group-listing-desc");
@@ -148,7 +155,7 @@ function add_listing(ginfo) {
   item.classList.add("group-listing");
   item.id = gid;
 
-  item.appendChild(a);
+  item.appendChild(p1);
   item.appendChild(p2);
 
   item.addEventListener("click", () => {
@@ -179,6 +186,7 @@ function ui_init(group_listing, matrep) {
   linkVis.open();
   const linkArrows = gui.addFolder('linkArrows');
   linkArrows.open();
+  gui.close();
 
   window.plot_from_gid = (gid) => {
 
@@ -207,18 +215,21 @@ function ui_init(group_listing, matrep) {
           .onChange(() =>
             plt.linkVisibility(d => UIPARAMS[`linkVisibility #${d.group}`])
           );
-        linkArrows
-          .add(UIPARAMS, `linkArrows #${idx}`, 0, 30, 0.01)
-          .onChange(() =>
-            plt.linkDirectionalArrowLength(d => UIPARAMS[`linkArrows #${d.group}`])
-          );
+        const g = G.gens[idx];
+        if (g.mul(g) != G.id) {
+          linkArrows
+            .add(UIPARAMS, `linkArrows #${idx}`, 0, 30, 0.01)
+            .onChange(() =>
+              plt.linkDirectionalArrowLength(d => UIPARAMS[`linkArrows #${d.group}`])
+            )
+            .setValue(15);
+        }
       }
     );
     linkArrows.add(UIPARAMS, `arrowPos`, 0, 1, 0.01)
       .onChange(() => plt.linkDirectionalArrowRelPos(UIPARAMS[`arrowPos`]))
   }
 
-  
   const create_group_listing = () => {
     const f = FILTER.value.toLowerCase();
     const d = parseInt(DEGREE.value);
@@ -242,6 +253,9 @@ function ui_init(group_listing, matrep) {
   create_group_listing();
   FILTER.addEventListener("input", create_group_listing);
   DEGREE.addEventListener("input", create_group_listing);
+
+  // Default plot
+  plot_from_gid("60_5");
 }
 
 window.addEventListener("load", () =>
@@ -283,7 +297,7 @@ window.addEventListener("load", () =>
 <h1 id="cayley-graphs-">Cayley Graphs <span style="font-size: 0.5em;text-shadow: 0 0 0.2em #e18ce4,0 0 0.25em rgba(247,101,252,0.7),0 0 0.3em rgba(247,101,252,0.5),0 0 0.4em rgba(247,101,252,0.3),0 0 0.6em rgba(247,101,252,0.2),0 0 1em rgba(247,101,252,0.1);">by JuliaPoo</span></h1>
 
 <div style="display:flex; justify-content: center;">
-<div style="font-size: calc(25em/60);letter-spacing:.017rem;color:#01fdc7">
+<div style="font-size: calc(25em/60);color:#01fdc7">
 <pre>
               ___ ~^`)"___``^^/^"```\:~__
             _y``__@(-/``````7`~`^^'\~:}~,`x~_
@@ -316,10 +330,14 @@ _K;      [    __<'{>~`` ```````j`r ){( _/`  ] U      \[ ML
 </div>
 </div>
 
+<h2 id="where-am-i-">Where am I?</h2>
+<p>This tiny place on the internet contains 3D plots of Cayley Graphs of over 6000 finite groups. Cayley Graphs are pretty, and this site allows one to explore many of them.</p>
 <h2 id="what-are-cayley-graphs-">What are Cayley Graphs?</h2>
-<p>They&#39;re a visual for how elements in a group are related. Groups are elementary objects with loads of symmetry seen everywhere in Mathematics.</p>
-<p>I&#39;m currently working on a full blog post exploring these visuals. These visuals are usually not very useful and it&#39;s usually easier to work on groups abstractly, but I decided to make this little project to satisfy my curiosity.</p>
-<p>I&#39;ll update this page once that&#39;s done!</p>
+<p>They&#39;re a visual for how elements in a group are related, where groups are sets of objects whose relationships with each other are full of symmetry. Groups are one of the most fundamental objects in Math and so appear everywhere in Math.</p>
+<p>I&#39;m currently working on a blog post on Cayley Graphs. Cayley Graphs are not very useful and it&#39;s usually easier to work on groups abstractly, but Cayley Graphs by themselves look really pretty. I&#39;ll update this page once that&#39;s done.</p>
+<h2 id="how-do-i-use-this-page-">How do I use this page?</h2>
+<p>Select the group you want from the listing. You can filter the listing by keywords and the order of the group.</p>
+<p>The graph will plot immediately, and you can rotate, zoom and pan the plot with drag, scroll and right-click-drag.</p>
 <h2 id="what-groups-are-supported-">What Groups are supported?</h2>
 <p>All groups of order <code>2</code> to <code>500</code> except:</p>
 <ol>
@@ -340,21 +358,27 @@ _K;      [    __<'{>~`` ```````j`r ){( _/`  ] U      \[ ML
 <li>TODO: Blog post</li>
 </ul>
 
-</ul>
-
     </div>
   </div>
 </body>
 <!--
 # Cayley Graphs!
 
+## Where am I?
+
+This tiny place on the internet contains 3D plots of Cayley Graphs of over 6000 finite groups. Cayley Graphs are pretty, and this site allows one to explore many of them.
+
 ## What are Cayley Graphs?
 
-They're a visual for how elements in a group are related. Groups are elementary objects with loads of symmetry seen everywhere in Mathematics.
+They're a visual for how elements in a group are related, where groups are sets of objects whose relationships with each other are full of symmetry. Groups are one of the most fundamental objects in Math and so appear everywhere in Math.
 
-I'm currently working on a full blog post exploring these visuals. These visuals are usually not very useful and it's usually easier to work on groups abstractly, but I decided to make this little project to satisfy my curiosity.
+I'm currently working on a blog post on Cayley Graphs. Cayley Graphs are not very useful and it's usually easier to work on groups abstractly, but Cayley Graphs by themselves look really pretty. I'll update this page once that's done.
 
-I'll update this page once that's done!
+## How do I use this page?
+
+Select the group you want from the listing. You can filter the listing by keywords and the order of the group.
+
+The graph will plot immediately, and you can rotate, zoom and pan the plot with drag, scroll and right-click-drag.
 
 ## What Groups are supported?
 

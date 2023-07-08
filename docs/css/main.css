@@ -271,3 +271,7 @@ body {
     position: absolute;
     right: 0;
 }
+
+#ui-control, #ui-control * {
+    font-size: 1em;
+}
