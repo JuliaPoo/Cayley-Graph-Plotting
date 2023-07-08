@@ -272,6 +272,6 @@ body {
     right: 0;
 }
 
-#ui-control, #ui-control * {
-    font-size: 1em;
+#ui-control, #ui-control *{
+    font-size: 0.96em;
 }
