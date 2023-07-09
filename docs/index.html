@@ -190,13 +190,17 @@ function highlight_activegid() {
 
 function ui_init(group_listing, matrep) {
   const [plt, scene] = init_plot();
+  const linkforcectx = plt.d3Force('link')
+
   const gui = new dat.GUI({autoPlace: false});
   PLOT.appendChild(gui.domElement);
   gui.domElement.id = "ui-control";
   const linkVis = gui.addFolder('linkVisibility');
-  linkVis.open();
+  linkVis.close();
   const linkArrows = gui.addFolder('linkArrows');
-  linkArrows.open();
+  linkArrows.close();
+  const linkForce = gui.addFolder("linkForce");
+  linkForce.close();
   gui.close();
 
   window.plot_from_gid = (gid) => {
@@ -211,21 +215,34 @@ function ui_init(group_listing, matrep) {
       linkVis.__controllers[0].remove();
     while (linkArrows.__controllers.length > 0)
       linkArrows.__controllers[0].remove();
+    while (linkForce.__controllers.length > 0)
+      linkForce.__controllers[0].remove();
 
     new Array(G.gens.length).fill(true)
       .forEach((v, idx) => {
         UIPARAMS[`linkVisibility #${idx}`] = v;
         UIPARAMS[`linkArrows #${idx}`] = 0;
+        UIPARAMS[`linkForce #${idx}`] = 30;
       });
     UIPARAMS[`arrowPos`] = 0.5;
 
     new Array(G.gens.length).fill(1).forEach(
       (_, idx) => {
+
         linkVis
           .add(UIPARAMS, `linkVisibility #${idx}`, true)
           .onChange(() =>
             plt.linkVisibility(d => UIPARAMS[`linkVisibility #${d.group}`])
           );
+
+        linkForce
+          .add(UIPARAMS, `linkForce #${idx}`, 0, 500, 0.01)
+          .onChange(() => {
+            linkforcectx.distance(d => UIPARAMS[`linkForce #${d.group}`]);
+            plt.numDimensions(3); // Reheat
+          })
+          .setValue(30);
+
         const g = G.gens[idx];
         if (g.mul(g) != G.id) {
           linkArrows
